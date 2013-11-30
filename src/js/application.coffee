@@ -5,11 +5,11 @@ $(document).ready ->
 	ratio = 1920 / 1080
 
 	backgroundDetail = 100
-	backgroundBlur = 3
+	backgroundBlur = 4
 
 	fps = 
 		video: 1000 / 30
-		background: 1000 / 10
+		background: 1000 / 15
 
 	# End Configure -------------------------------------------------------
 
@@ -24,7 +24,7 @@ $(document).ready ->
 
 	screen = {}
 
-	$(window).on 'resize', do ->
+	do setsizes = ->
 		o_screen =
 			width : $(window).width()
 			height: $(window).height()
@@ -41,6 +41,8 @@ $(document).ready ->
 		$canvas.attr
 			width : screen.width
 			height: screen.height
+
+	$(window).on 'resize', setsizes
 
 	###
 	$video[0].play()
