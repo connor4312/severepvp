@@ -4,7 +4,9 @@ $(document).ready ->
 
 	ctx    = $canvas[0].getContext('2d')
 
-	fps = 1000 / 30
+	fps = 
+		video: 1000 / 30
+		background: 1000 / 10
 
 	screen =
 		width : $(window).width()
@@ -15,13 +17,15 @@ $(document).ready ->
 			width : screen.width
 			height: screen.height
 	
+	###
 	$video[0].play()
 	do draw = ->
 		if not @paused and not @ended
 			ctx.drawImage $video[0], 0, 0, screen.width, screen.height
-			setTimeout draw, fps
+			setTimeout draw, fps.video
 		else
 			openMenu()
+	###
 	
 	scene = new Phoria.Scene()
 	scene.camera.position = { x: 1, y: 1, z: 1 }
@@ -34,7 +38,8 @@ $(document).ready ->
 
 	renderer = new Phoria.CanvasRenderer(canvas);
 
-	openMenu = _.after 2, ->
+	#openMenu = _.after 2, ->
+	openMenu = ->
 		s = 1
 
 		sets = [
@@ -74,7 +79,7 @@ $(document).ready ->
 
 		do fmAnimate = ->
 
-			rotdeg += 0.01
+			rotdeg += 0.05
 
 			scene.camera.lookat.x = Math.cos(rotdeg) * 0.1
 			scene.camera.lookat.y = Math.sin(rotdeg) * 0.1
@@ -84,7 +89,9 @@ $(document).ready ->
 			scene.modelView()
 			renderer.render(scene);
 
-			setTimeout fmAnimate, fps
+			stackBlurCanvasRGB ctx, 0, 0, screen.width, screen.height, 30
+
+			setTimeout fmAnimate, fps.background
 
 	loader = new Phoria.Preloader()
 	bitmaps = []
