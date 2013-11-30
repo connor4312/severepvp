@@ -1,22 +1,40 @@
 $(document).ready ->
-	$canvas = $('#canvas')
-	$video  = $('#video')
 
-	ctx    = $canvas[0].getContext('2d')
+	# Configure -----------------------------------------------------------
+
+	ratio = 1920 / 1080
 
 	fps = 
 		video: 1000 / 30
 		background: 1000 / 10
 
-	screen =
-		width : $(window).width()
-		height: $(window).height()
+	# End Configure -------------------------------------------------------
+
+	$canvas = $('#canvas')
+	$video  = $('#video')
+
+	ctx    = $canvas[0].getContext('2d')
+
+	screen = {}
 
 	$(window).on 'resize', do ->
+		o_screen =
+			width : $(window).width()
+			height: $(window).height()
+
+		if o_screen.height * ratio > o_screen.width
+			screen =
+				width : o_screen.width
+				height: o_screen.width / ratio
+		else
+			screen =
+				width : o_screen.height * ratio
+				height: o_screen.height
+		
 		$canvas.attr
 			width : screen.width
 			height: screen.height
-	
+
 	###
 	$video[0].play()
 	do draw = ->
