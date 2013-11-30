@@ -17,6 +17,7 @@
   ],
   "dependencies": {
     "bootstrap": "~3.0.2",
-    "underscore": "~1.0.2"
+    "underscore": "~1.0.2",
+    "phoria": "git://github.com/kevinroast/phoria.js.git#0.9.11"
   }
 }
