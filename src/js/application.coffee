@@ -1,6 +1,6 @@
 $(document).ready ->
 	$canvas = $('#canvas')
-	$video  = $('#video')[0]
+	$video  = $('#video')
 
 	ctx    = $canvas[0].getContext('2d')
 
@@ -9,11 +9,13 @@ $(document).ready ->
 		height: $(window).height()
 
 	$(window).on 'resize', do ->
-		$canvas.width  screen.width
-		$canvas.height screen.height
+		$canvas.attr
+			width : screen.width
+			height: screen.height
 
-	video.play()
+	$video[0].play()
 	do draw = ->
 		if not @paused and not @ended
-			ctx.drawImage video, 0, 0, screen.width, screen.height
-			setTimeout draw, 1000 / 30
+			debugger;
+			ctx.drawImage $video[0], 0, 0, screen.width, screen.height
+		setTimeout draw, 1000 / 30
