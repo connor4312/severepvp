@@ -1,6 +1,6 @@
 $(document).ready ->
 
-	# Configure -----------------------------------------------------------
+	# Start Configure -----------------------------------------------------
 
 	ratio = 1920 / 1080
 
@@ -11,7 +11,10 @@ $(document).ready ->
 		video: 1000 / 30
 		background: 1000 / 15
 
+
 	# End Configure -------------------------------------------------------
+
+	# Start Global Setups -------------------------------------------------
 
 	$canvas = $('#canvas')
 	$video  = $('#video')
@@ -23,6 +26,7 @@ $(document).ready ->
 		height: Math.round(backgroundDetail)
 
 	screen = {}
+	buttonsizes = {}
 
 	do setsizes = ->
 		o_screen =
@@ -38,12 +42,25 @@ $(document).ready ->
 				width : o_screen.height * ratio
 				height: o_screen.height
 		
+		buttonsizes = 
+			width : Math.min(1000, screen.width * 0.8)
+			height: Math.min(1000, screen.width * 0.8) * 0.1
+
 		$canvas.attr
 			width : screen.width
 			height: screen.height
 
 	$(window).on 'resize', setsizes
 
+	makeAuxCanvas = ->
+		elem = $('<canvas />')
+		$('#hidebox').append elem
+
+		return elem
+
+	# End Global Setups ---------------------------------------------------
+
+	# Start Video Stage ---------------------------------------------------
 	###
 	$video[0].play()
 	do draw = ->
@@ -53,15 +70,9 @@ $(document).ready ->
 		else
 			openMenu()
 	###
-
-	makeAuxCanvas = ->
-
-		elem = $('<canvas />')
-		$('#hidebox').append elem
-
-		return elem
+	# End Vide Stoage -----------------------------------------------------
 	
-	
+	# Start 3D Background -------------------------------------------------
 
 	scene = new Phoria.Scene()
 	scene.camera.position = { x: 1, y: 1, z: 1 }
@@ -106,7 +117,7 @@ $(document).ready ->
 				style:
 					shademode: "plain"
 
-			planes[i].textures.push bitmaps[i]
+			planes[i].textures.push resources['tex' + i]
 			planes[i].polygons[0].texture = 0
 
 			scene.graph.push planes[i]
@@ -139,11 +150,35 @@ $(document).ready ->
 
 			setTimeout fmAnimate, fps.background
 
-	loader = new Phoria.Preloader()
-	bitmaps = []
+	# End 3D Background ---------------------------------------------------
 
-	for i in [0..2]
-		bitmaps.push new Image()
-		loader.addImage bitmaps[i], 'img/tex' + i + '.png'
+	# Start Button --------------------------------------------------------
+
+	#class Button
+
+
+	# End Button ----------------------------------------------------------
+
+	# Start Render Tie-in -------------------------------------------------
+
+	# End Render Tie-in ---------------------------------------------------
+
+	# Start Preloaders ----------------------------------------------------
+
+	loader = new Phoria.Preloader()
+
+	resources =
+		tex0: 'img/tex0.png'
+		tex1: 'img/tex1.png'
+		tex2: 'img/tex2.png'
+		buttonInactive: 'img/button-inactive.png'
+		buttonActive  : 'img/button-active.png'
+
+	for key, url of resources
+		im = new Image()
+		resources[key] = im
+		loader.addImage im, url
 
 	loader.onLoadCallback openMenu
+
+	# End Preloaders ------------------------------------------------------
