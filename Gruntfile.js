@@ -74,10 +74,8 @@ module.exports = function(grunt) {
     copy: {
       dist: {
         files: [{
-          expand: true,
-          cwd: 'src',
-          src: ['**/*.{webm}'],
-          dest: 'dist',
+          src: ['src/vid/intro.webm'],
+          dest: 'dist/vid/intro.webm',
         }]
       }
     },
