@@ -4,6 +4,9 @@ $(document).ready ->
 
 	ratio = 1920 / 1080
 
+	backgroundDetail = 100
+	backgroundBlur = 3
+
 	fps = 
 		video: 1000 / 30
 		background: 1000 / 10
@@ -14,6 +17,10 @@ $(document).ready ->
 	$video  = $('#video')
 
 	ctx    = $canvas[0].getContext('2d')
+
+	d3canvassize = 
+		width : Math.round(backgroundDetail * ratio)
+		height: Math.round(backgroundDetail)
 
 	screen = {}
 
@@ -44,17 +51,26 @@ $(document).ready ->
 		else
 			openMenu()
 	###
+
+	makeAuxCanvas = ->
+
+		elem = $('<canvas />')
+		$('#hidebox').append elem
+
+		return elem
 	
+	
+
 	scene = new Phoria.Scene()
 	scene.camera.position = { x: 1, y: 1, z: 1 }
 	scene.camera.lookat = { x: 0, y: 0, z: 0 }
 	scene.perspective.near = 0.05
 	scene.perspective.far = 5
-	scene.perspective.aspect = screen.width / screen.height
-	scene.viewport.width = screen.width
-	scene.viewport.height = screen.height
+	scene.perspective.aspect = d3canvassize.width / d3canvassize.height
+	scene.viewport.width = d3canvassize.width
+	scene.viewport.height = d3canvassize.height
 
-	renderer = new Phoria.CanvasRenderer(canvas);
+	
 
 	#openMenu = _.after 2, ->
 	openMenu = ->
@@ -95,9 +111,18 @@ $(document).ready ->
 		
 		rotdeg = 0
 
-		do fmAnimate = ->
+		($d3canvas = makeAuxCanvas()).attr
+			width: d3canvassize.width
+			height: d3canvassize.height
 
-			rotdeg += 0.05
+		d3canvas = $d3canvas[0]
+		d3canvasctx = d3canvas.getContext '2d'
+
+		renderer = new Phoria.CanvasRenderer d3canvas
+
+		do fmAnimate = ->
+			
+			rotdeg += 0.02
 
 			scene.camera.lookat.x = Math.cos(rotdeg) * 0.1
 			scene.camera.lookat.y = Math.sin(rotdeg) * 0.1
@@ -107,7 +132,8 @@ $(document).ready ->
 			scene.modelView()
 			renderer.render(scene);
 
-			stackBlurCanvasRGB ctx, 0, 0, screen.width, screen.height, 30
+			stackBlurCanvasRGB d3canvasctx, 0, 0, d3canvassize.width, d3canvassize.height, backgroundBlur
+			ctx.drawImage d3canvas, 0, 0, screen.width, screen.height
 
 			setTimeout fmAnimate, fps.background
 
