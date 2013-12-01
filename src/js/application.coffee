@@ -17,7 +17,7 @@ $(document).ready ->
 
 	button =
 		width: 289
-		height: 300
+		height: 123
 
 	mainColor = '#1cafd4'
 
@@ -78,7 +78,7 @@ $(document).ready ->
 			width : screen.width
 			height: screen.height
 
-	$(window).on 'resize', setsizes
+	$(window).on 'resize', _.throttle(setsizes, 50)
 
 
 	# End Global Setups ---------------------------------------------------
@@ -137,16 +137,18 @@ $(document).ready ->
 			Renderer.buttons.push @
 
 		calcRect: (index = 0, len = 1) ->
-			factor = Math.min(screen.width * 0.75, 600) / 1000
+			factor = Math.min((screen.width * 0.8) / (len * (button.width + -30)), 1)
+			spacing = -30 * factor
 
 			return {
-				width: button.width
-				height: button.height
-				spacing: -30
-				y: (screen.height - button.height) * 0.5
-				x: (screen.width - (len * (button.width + -30))) * 0.5 + index * (button.width + -30)
-				text_x: button.width * 0.5
-				text_y: button.height * 0.75 
+				factor: factor
+				width: button.width * factor
+				height: button.height * factor
+				spacing: spacing
+				y: (screen.height - button.height * factor) * 0.5
+				x: (screen.width - (len * (button.width * factor + spacing))) * 0.5 + index * (button.width * factor + spacing)
+				text_x: button.width * 0.5 * factor
+				text_y: button.height * 1.9 * factor
 			}
 
 		render: (index, len) ->
@@ -155,10 +157,11 @@ $(document).ready ->
 			ctx.textBaseline = 'middle'
 			ctx.textAlign = 'center'
 
+			debugger;
 			i = @calcRect index, len
 
-			ctx.drawImage resources.basePlate, i.x, i.y + 120
-			ctx.drawImage resources['ico' + @text], i.x + (button.width - 128) * 0.5, i.y + Math.cos(@deg) * 20
+			ctx.drawImage resources.basePlate, i.x, i.y + 120 * i.factor, i.width, i.height
+			ctx.drawImage resources['ico' + @text], i.x + (button.width - 128) * 0.5 * i.factor, i.y + Math.cos(@deg) * 20 * i.factor, 128 * i.factor, 128 * i.factor
 			
 			@deg += 0.05
 
@@ -331,7 +334,7 @@ $(document).ready ->
 				tick = false
 				for b, index in Renderer.buttons
 					i = b.calcRect(index, Renderer.buttons.length)
-					if mousePos.x > i.x and mousePos.y > i.y and mousePos.x < i.x + i.width and mousePos.y < i.y + i.height
+					if mousePos.x > i.x and mousePos.y > i.y and mousePos.x < i.x + i.width and mousePos.y < i.y + i.height * 2
 						b.hovering = true
 						$canvas.css 'cursor', 'pointer'
 						tick = true
