@@ -167,6 +167,19 @@ $(document).ready ->
 			@hovering = false
 			Renderer.buttons.push @
 
+		calcRect: (index = 0) ->
+			factor = Math.min(screen.width * 0.75, 600) / 1000
+
+			return {
+				width: button.width * factor
+				height: button.height * factor
+				spacing: 10
+				y: 130 + logo.height + (((button.height * factor) + 10) * index)
+				x: (screen.width - button.width * factor) * 0.5
+				text_x: screen.width * 0.5
+				text_y: (button.height * factor) * 0.5
+			}
+
 	# End Button ----------------------------------------------------------
 
 	# Start Render Tie-in -------------------------------------------------
@@ -235,33 +248,37 @@ $(document).ready ->
 				if @motdscale.scale <= @motdscale.min
 					@motdscale.up = true
 
+		credits: ->
+			ctx.font = '24px Minecraft'
+			ctx.fillStyle = '#ffffff'
+			ctx.textBaseline = 'bottom'
+
+			ctx.textAlign = 'left'
+			ctx.fillText '(C) SeverePVP: Release 1.0', 5, screen.height - 5
+
+			ctx.textAlign = 'right'
+			ctx.fillText 'Coded by Vector Media', screen.width - 5, screen.height - 5
+
 		renderButtons: =>
 			factor = Math.min(screen.width * 0.75, 600) / 1000
-			i =
-				width: button.width * factor
-				height: button.height * factor
-				spacing: 10
-				y: 130 + logo.height
-				x: (screen.width - button.width * factor) * 0.5
-				tx: screen.width * 0.5
-				ty: (button.height * factor) * 0.5
 			
-			ctx.font = Math.round(i.height * 0.33) + 'px Minecraft'
+			ctx.font = Math.round(button.height * factor * 0.33) + 'px Minecraft'
 			ctx.textBaseline = 'middle'
 			ctx.textAlign = 'center'
 
-			for b in @buttons
+			for b, index in @buttons
+
+				i = b.calcRect(index)
+
 				if b.hovering is true
 					ctx.drawImage resources.buttonActive, i.x, i.y, i.width, i.height
 				else
 					ctx.drawImage resources.buttonInactive, i.x, i.y, i.width, i.height
 				
 				ctx.fillStyle = '#000000'
-				ctx.fillText b.text, i.tx + 2, i.y + i.ty + 2
+				ctx.fillText b.text, i.text_x + 2, i.y + i.text_y + 2
 				ctx.fillStyle = '#ffffff'
-				ctx.fillText b.text, i.tx, i.y + i.ty
-
-				i.y += i.height + i.spacing
+				ctx.fillText b.text, i.text_x, i.y + i.text_y
 
 
 		render: =>
@@ -270,6 +287,7 @@ $(document).ready ->
 				@bg.fmAnimate()
 				@logoAndMotd()
 				@renderButtons()
+				@credits()
 
 			if @stage is 0
 				if @fadep < 1
@@ -315,3 +333,26 @@ $(document).ready ->
 	loader.onLoadCallback Renderer.start
 
 	# End Preloaders ------------------------------------------------------
+
+	# Document Triggers ---------------------------------------------------
+
+	getMousePos = (canvas, evt) ->
+		rect = $canvas[0].getBoundingClientRect()
+		return {
+			x: evt.clientX - rect.left,
+			y: evt.clientY - rect.top
+		}
+
+
+	$canvas[0].addEventListener 'mousemove', _.throttle(
+		(evt) ->
+			mousePos = getMousePos canvas, evt
+
+			for b, index in Renderer.buttons
+				i = b.calcRect(index)
+				if mousePos.x > i.x and mousePos.y > i.y and mousePos.x < i.x + i.width and mousePos.y < i.y + i.height
+					b.hovering = true
+				else
+					b.hovering = false
+		, fps.background * 0.5
+	)
