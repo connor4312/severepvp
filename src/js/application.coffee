@@ -15,6 +15,10 @@ $(document).ready ->
 		width: 561
 		height: 137
 
+	button =
+		width: 1000
+		height: 100
+
 
 	# End Configure -------------------------------------------------------
 
@@ -157,11 +161,11 @@ $(document).ready ->
 
 	# Start Button --------------------------------------------------------
 	
-	buttonRegistry = []
-	
 	class Button
-		constructor: ->
-			buttonRegistry.push @
+		constructor: (text) ->
+			@text = text
+			@hovering = false
+			Renderer.buttons.push @
 
 	# End Button ----------------------------------------------------------
 
@@ -171,7 +175,11 @@ $(document).ready ->
 		constructor: ->
 			@starter = _.after 2, ->
 				@bg = new Background
+				new Button('Button 1')
+				new Button('Button 2')
+				new Button('Button 3')
 				@render()
+
 			@fadep = 0
 			@stage = 0
 
@@ -184,6 +192,9 @@ $(document).ready ->
 				scale: 24
 				min: 22,
 				max: 26
+
+			@buttons = []
+
 		start: =>
 			@starter()
 
@@ -224,11 +235,41 @@ $(document).ready ->
 				if @motdscale.scale <= @motdscale.min
 					@motdscale.up = true
 
+		renderButtons: =>
+			factor = Math.min(screen.width * 0.75, 600) / 1000
+			i =
+				width: button.width * factor
+				height: button.height * factor
+				spacing: 10
+				y: 130 + logo.height
+				x: (screen.width - button.width * factor) * 0.5
+				tx: screen.width * 0.5
+				ty: (button.height * factor) * 0.5
+			
+			ctx.font = Math.round(i.height * 0.33) + 'px Minecraft'
+			ctx.textBaseline = 'middle'
+			ctx.textAlign = 'center'
+
+			for b in @buttons
+				if b.hovering is true
+					ctx.drawImage resources.buttonActive, i.x, i.y, i.width, i.height
+				else
+					ctx.drawImage resources.buttonInactive, i.x, i.y, i.width, i.height
+				
+				ctx.fillStyle = '#000000'
+				ctx.fillText b.text, i.tx + 2, i.y + i.ty + 2
+				ctx.fillStyle = '#ffffff'
+				ctx.fillText b.text, i.tx, i.y + i.ty
+
+				i.y += i.height + i.spacing
+
+
 		render: =>
 
 			if @stage is 1 or @stage is 2
 				@bg.fmAnimate()
 				@logoAndMotd()
+				@renderButtons()
 
 			if @stage is 0
 				if @fadep < 1
