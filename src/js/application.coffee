@@ -61,15 +61,15 @@ $(document).ready ->
 	# End Global Setups ---------------------------------------------------
 
 	# Start Video Stage ---------------------------------------------------
-	###
+	
 	$video[0].play()
 	do draw = ->
-		if not @paused and not @ended
+		if not $video[0].paused and not $video[0].ended
 			ctx.drawImage $video[0], 0, 0, screen.width, screen.height
 			setTimeout draw, fps.video
 		else
 			Renderer.start()
-	###
+	
 	# End Vide Stoage -----------------------------------------------------
 	
 	# Start 3D Background -------------------------------------------------
@@ -164,9 +164,12 @@ $(document).ready ->
 	# Start Render Tie-in -------------------------------------------------
 
 	class RendererO
+		constructor: ->
+			@starter = _.after 2, ->
+				@bg = new Background
+				@render()
 		start: =>
-			@bg = new Background
-			@render()
+			@starter()
 
 		render: =>
 			@bg.fmAnimate()

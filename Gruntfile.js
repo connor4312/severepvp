@@ -80,8 +80,10 @@ module.exports = function(grunt) {
     copy: {
       dist: {
         files: [{
-          src: ['src/vid/intro.webm', 'src/vid/intro.mp4'],
-          dest: 'dist/vid',
+          expand: true,
+          cwd: 'src/vid',
+          src: ['*'],
+          dest: 'dist/vid'
         }, {
           src: ['bower_components/phoria/scripts/phoria-min.js'],
           dest: 'dist/js/phoria.js'
