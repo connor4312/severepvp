@@ -9,16 +9,40 @@ $(document).ready ->
 
 	fps = 
 		video: 1000 / 30
-		background: 1000 / 15
+		background: 1000 / 30
 
 	logo = 
 		width: 561
 		height: 137
 
 	button =
-		width: 1000
-		height: 100
+		width: 289
+		height: 300
 
+	mainColor = '#1cafd4'
+
+	buttonList = [
+		{
+			text: 'Forum'
+			func: -> window.location = 'http://severepvp.net/community/'
+		}
+		{
+			text: 'Vote'
+			func: ->
+		}
+		{
+			text: 'Shop'
+			func: -> window.location = 'http://severepvp.buycraft.net/'
+		}
+		{
+			text: 'Staff'
+			func: ->
+		}
+		{
+			text: 'Bans'
+			func: -> window.location = 'http://severepvp.net/banmanagement/'
+		}
+	]
 
 	# End Configure -------------------------------------------------------
 
@@ -28,10 +52,6 @@ $(document).ready ->
 	$video  = $('#video')
 
 	ctx    = $canvas[0].getContext('2d')
-
-	d3canvassize = 
-		width : Math.round(backgroundDetail * ratio)
-		height: Math.round(backgroundDetail)
 
 	screen = {}
 	buttonsizes = {}
@@ -60,11 +80,6 @@ $(document).ready ->
 
 	$(window).on 'resize', setsizes
 
-	makeAuxCanvas = ->
-		elem = $('<canvas />')
-		$('#hidebox').append elem
-
-		return elem
 
 	# End Global Setups ---------------------------------------------------
 
@@ -85,100 +100,77 @@ $(document).ready ->
 	#openMenu = _.after 2, ->
 	class Background
 		constructor: ->
-
-			@makeScene()
-
-			s = 1
-
-			sets = [
-				{
-					points: [{x: s, y: 0, z: 0}, {x: 0, y: 0, z: 0}, {x: 0, y: s, z: 0}, {x: s, y: s, z: 0}],
-					edges: [{a: 0, b: 1}, {a: 1, b: 2}, {a: 2, b: 3}, {a: 3, b: 4}]
-					polygons: [{vertices: [3..0]}]
-				}
-				{
-					points: [{x: 0, y: 0, z: 0}, {x: 0, y: 0, z: s}, {x: s, y: 0, z: s}, {x: s, y: 0, z: 0}],
-					edges: [{a: 0, b: 1}, {a: 1, b: 2}, {a: 2, b: 3}, {a: 3, b: 4}]
-					polygons: [{vertices: [0..3]}]
-				}
-				{
-					points: [{x: 0, y: s, z: 0}, {x: 0, y: s, z: s}, {x: 0, y: 0, z: s}, {x: 0, y: 0, z: 0}],
-					edges: [{a: 0, b: 1}, {a: 1, b: 2}, {a: 2, b: 3}, {a: 3, b: 4}]
-					polygons: [{vertices: [0..3]}]
-				}
-			]
-
-			planes = []
-
-			for item, i in sets
-				planes[i] = Phoria.Entity.create
-					points: item.points
-					edges: item.edges
-					polygons: item.polygons
-					style:
-						shademode: "plain"
-
-				planes[i].textures.push resources['tex' + i]
-				planes[i].polygons[0].texture = 0
-
-				@scene.graph.push planes[i]
-			
-			@rotdeg = 0
-
-			($d3canvas = makeAuxCanvas()).attr
-				width: d3canvassize.width
-				height: d3canvassize.height
-
-			@d3canvas = $d3canvas[0]
-			@d3canvasctx = @d3canvas.getContext '2d'
-
-			@d3renderer = new Phoria.CanvasRenderer @d3canvas
-
-		makeScene: ->
-			@scene = new Phoria.Scene()
-			@scene.camera.position = { x: 1, y: 1, z: 1 }
-			@scene.camera.lookat = { x: 0, y: 0, z: 0 }
-			@scene.perspective.near = 0.05
-			@scene.perspective.far = 5
-			@scene.perspective.aspect = d3canvassize.width / d3canvassize.height
-			@scene.viewport.width = d3canvassize.width
-			@scene.viewport.height = d3canvassize.height
+			#@pat = ctx.createPattern resources.bg, 'repeat'
+			@off = 0
+			@img =
+				src: resources.bg
+				width: 330
+				height: 320
 
 		fmAnimate: ->
 			
-			@rotdeg += 0.02
+			ctx.fillStyle = @pat;
 
-			@scene.camera.lookat.x = Math.cos(@rotdeg) * 0.1
-			@scene.camera.lookat.y = Math.sin(@rotdeg) * 0.1
+			w = 0
+			while w < screen.width
+				h = @off
 
-			@scene.modelView()
-			@d3renderer.render(@scene);
+				while h < screen.height
+					ctx.drawImage @img.src, w, h
+					h += @img.height
 
-			stackBlurCanvasRGB @d3canvasctx, 0, 0, d3canvassize.width, d3canvassize.height, backgroundBlur
-			ctx.drawImage @d3canvas, 0, 0, screen.width, screen.height
+				w += @img.width
+
+			@off -= 1
+			if -@off >= @bgh then @off = 0
 
 	# End 3D Background ---------------------------------------------------
 
 	# Start Button --------------------------------------------------------
 	
 	class Button
-		constructor: (text) ->
+		constructor: (text, eve) ->
 			@text = text
 			@hovering = false
+			@eve = eve
+			@deg = Math.random() * Math.PI
 			Renderer.buttons.push @
 
-		calcRect: (index = 0) ->
+		calcRect: (index = 0, len = 1) ->
 			factor = Math.min(screen.width * 0.75, 600) / 1000
 
 			return {
-				width: button.width * factor
-				height: button.height * factor
-				spacing: 10
-				y: 130 + logo.height + (((button.height * factor) + 10) * index)
-				x: (screen.width - button.width * factor) * 0.5
-				text_x: screen.width * 0.5
-				text_y: (button.height * factor) * 0.5
+				width: button.width
+				height: button.height
+				spacing: -30
+				y: (screen.height - button.height) * 0.5
+				x: (screen.width - (len * (button.width + -30))) * 0.5 + index * (button.width + -30)
+				text_x: button.width * 0.5
+				text_y: button.height * 0.75 
 			}
+
+		render: (index, len) ->
+			
+			ctx.font = '24px Orbitron'
+			ctx.textBaseline = 'middle'
+			ctx.textAlign = 'center'
+
+			i = @calcRect index, len
+
+			ctx.drawImage resources.basePlate, i.x, i.y + 120
+			ctx.drawImage resources['ico' + @text], i.x + (button.width - 128) * 0.5, i.y + Math.cos(@deg) * 20
+			
+			@deg += 0.05
+
+			if @hovering
+				styles = ['#666600', '#ffff00']
+			else
+				styles = ['#000000', '#ffffff']
+
+			ctx.fillStyle = styles[0]
+			ctx.fillText @text, i.x + i.text_x + 2, i.y + i.text_y + 2
+			ctx.fillStyle = styles[1]
+			ctx.fillText @text, i.x + i.text_x, i.y + i.text_y
 
 	# End Button ----------------------------------------------------------
 
@@ -188,10 +180,12 @@ $(document).ready ->
 		constructor: ->
 			@starter = _.after 2, ->
 				@bg = new Background
-				new Button('Button 1')
-				new Button('Button 2')
-				new Button('Button 3')
+
+				for b in buttonList
+					new Button(b.text, b.func)
+
 				@render()
+				menuTriggers()
 
 			@fadep = 0
 			@stage = 0
@@ -249,44 +243,28 @@ $(document).ready ->
 					@motdscale.up = true
 
 		credits: ->
-			ctx.font = '24px Minecraft'
-			ctx.fillStyle = '#ffffff'
+			ctx.font = '16px Minecraft'
+			ctx.fillStyle = '#444444'
 			ctx.textBaseline = 'bottom'
 
 			ctx.textAlign = 'left'
-			ctx.fillText '(C) SeverePVP: Release 1.0', 5, screen.height - 5
+			ctx.fillText '(c) 2013 SeverePVP: Release 1.0', 5, screen.height - 5
 
 			ctx.textAlign = 'right'
 			ctx.fillText 'Coded by Vector Media', screen.width - 5, screen.height - 5
 
 		renderButtons: =>
-			factor = Math.min(screen.width * 0.75, 600) / 1000
-			
-			ctx.font = Math.round(button.height * factor * 0.33) + 'px Minecraft'
-			ctx.textBaseline = 'middle'
-			ctx.textAlign = 'center'
-
+			l = @buttons.length
 			for b, index in @buttons
-
-				i = b.calcRect(index)
-
-				if b.hovering is true
-					ctx.drawImage resources.buttonActive, i.x, i.y, i.width, i.height
-				else
-					ctx.drawImage resources.buttonInactive, i.x, i.y, i.width, i.height
-				
-				ctx.fillStyle = '#000000'
-				ctx.fillText b.text, i.text_x + 2, i.y + i.text_y + 2
-				ctx.fillStyle = '#ffffff'
-				ctx.fillText b.text, i.text_x, i.y + i.text_y
+				b.render(index, l)
 
 
 		render: =>
 
 			if @stage is 1 or @stage is 2
 				@bg.fmAnimate()
-				@logoAndMotd()
 				@renderButtons()
+				@logoAndMotd()
 				@credits()
 
 			if @stage is 0
@@ -315,44 +293,59 @@ $(document).ready ->
 
 	# Start Preloaders ----------------------------------------------------
 
-	loader = new Phoria.Preloader()
-
 	resources =
-		tex0: 'img/tex0.png'
-		tex1: 'img/tex1.png'
-		tex2: 'img/tex2.png'
-		buttonInactive: 'img/button-inactive.png'
-		buttonActive  : 'img/button-active.png'
+		bg: 'img/bg.png'
+		basePlate: 'img/baseplate.png'
 		logo: 'img/logo.png'
+		icoBans: 'img/ico-bans.png'
+		icoForum: 'img/ico-forum.png'
+		icoShop: 'img/ico-shop.png'
+		icoStaff: 'img/ico-staff.png'
+		icoVote: 'img/ico-vote.png'
+
+	loader = _.after _.keys(resources).length, Renderer.start
 
 	for key, url of resources
 		im = new Image()
 		resources[key] = im
-		loader.addImage im, url
-
-	loader.onLoadCallback Renderer.start
+		im.onload = loader
+		im.src = url
 
 	# End Preloaders ------------------------------------------------------
 
 	# Document Triggers ---------------------------------------------------
 
-	getMousePos = (canvas, evt) ->
-		rect = $canvas[0].getBoundingClientRect()
-		return {
-			x: evt.clientX - rect.left,
-			y: evt.clientY - rect.top
-		}
+	menuTriggers = ->
+
+		getMousePos = (canvas, evt) ->
+			rect = $canvas[0].getBoundingClientRect()
+			return {
+				x: evt.clientX - rect.left,
+				y: evt.clientY - rect.top
+			}
 
 
-	$canvas[0].addEventListener 'mousemove', _.throttle(
-		(evt) ->
-			mousePos = getMousePos canvas, evt
+		$canvas.on 'mousemove', _.throttle(
+			(evt) ->
+				mousePos = getMousePos canvas, evt
+				tick = false
+				for b, index in Renderer.buttons
+					i = b.calcRect(index, Renderer.buttons.length)
+					if mousePos.x > i.x and mousePos.y > i.y and mousePos.x < i.x + i.width and mousePos.y < i.y + i.height
+						b.hovering = true
+						$canvas.css 'cursor', 'pointer'
+						tick = true
+					else
+						b.hovering = false
 
+				if tick is true
+					$canvas.css 'cursor', 'pointer'
+				else 
+					$canvas.css 'cursor', 'auto'
+
+			, fps.background * 0.5
+		)
+
+		$canvas.on 'click', ->
 			for b, index in Renderer.buttons
-				i = b.calcRect(index)
-				if mousePos.x > i.x and mousePos.y > i.y and mousePos.x < i.x + i.width and mousePos.y < i.y + i.height
-					b.hovering = true
-				else
-					b.hovering = false
-		, fps.background * 0.5
-	)
+				if b.hovering is true then b.eve()
