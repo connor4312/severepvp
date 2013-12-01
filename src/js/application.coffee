@@ -11,6 +11,10 @@ $(document).ready ->
 		video: 1000 / 30
 		background: 1000 / 15
 
+	logo = 
+		width: 561
+		height: 137
+
 
 	# End Configure -------------------------------------------------------
 
@@ -168,12 +172,82 @@ $(document).ready ->
 			@starter = _.after 2, ->
 				@bg = new Background
 				@render()
+			@fadep = 0
+			@stage = 0
+
+			@motds = [
+				'Vote Now!'
+			]
+			@motdIndex = Math.floor(Math.random() * @motds.length)
+			@motdscale =
+				up: false
+				scale: 24
+				min: 22,
+				max: 26
 		start: =>
 			@starter()
 
-		render: =>
-			@bg.fmAnimate()
+		reset: ->
+			ctx.globalAlpha = 1
 
+		logoAndMotd: ->
+
+			ctx.drawImage resources.logo, screen.width * 0.5 - logo.width * 0.5, 50
+
+			textPos =
+				x: screen.width * 0.5 + logo.width * 0.5 - 60
+				y: 50 + logo.height - 60
+				width: 200
+
+			ctx.font = Math.round(@motdscale.scale) + 'px Minecraft'
+			ctx.fillStyle = '#666600'
+			ctx.textBaseline = 'top'
+
+			ctx.save();
+			ctx.translate textPos.x, textPos.y
+			ctx.rotate -Math.PI * 0.25
+			ctx.textAlign = 'center'
+
+			ctx.fillStyle = '#666600'
+			ctx.fillText @motds[@motdIndex], 3, 3, textPos.width
+			ctx.fillStyle = '#ffff00'
+			ctx.fillText @motds[@motdIndex], 0, 0, textPos.width
+
+			ctx.restore();
+
+			if @motdscale.up
+				@motdscale.scale += 0.5
+				if @motdscale.scale >= @motdscale.max
+					@motdscale.up = false
+			else
+				@motdscale.scale -= 0.5
+				if @motdscale.scale <= @motdscale.min
+					@motdscale.up = true
+
+		render: =>
+
+			if @stage is 1 or @stage is 2
+				@bg.fmAnimate()
+				@logoAndMotd()
+
+			if @stage is 0
+				if @fadep < 1
+					ctx.globalAlpha = @fadep
+					ctx.fillStyle = 'black'
+					ctx.fillRect 0, 0, screen.width, screen.height
+					@fadep += 0.2
+				else @stage++
+			
+			if @stage is 1
+
+				if @fadep > 0
+					ctx.globalAlpha = @fadep
+					ctx.fillStyle = 'black'
+					ctx.fillRect 0, 0, screen.width, screen.height
+					@fadep -= 0.03
+				else @stage++
+
+			@reset()
 			setTimeout @render, fps.background
 
 	Renderer = new RendererO
@@ -190,6 +264,7 @@ $(document).ready ->
 		tex2: 'img/tex2.png'
 		buttonInactive: 'img/button-inactive.png'
 		buttonActive  : 'img/button-active.png'
+		logo: 'img/logo.png'
 
 	for key, url of resources
 		im = new Image()
