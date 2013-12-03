@@ -27,3 +27,47 @@ body {
 	display: block;
 	box-shadow: 0 0 40px #000;
 }
+
+.button {
+	display: inline-block;
+	width: 20%;
+	height: 500px;
+	background-size: contain;
+	background-position: center top;
+	background-repeat: no-repeat;
+
+	text-indent: -9999px;
+	position: absolute;
+	top: 1000px;
+	.transition(0.3s);
+
+	&::after {
+		content: "\00a0";
+		display: block;
+		background: url('../img/glow.png') center top no-repeat;
+		width: 100%;
+		position: absolute;
+		height: 100%;
+		background-size: contain;
+		top: 0;
+		z-index: -5;
+		opacity: 0;
+	}
+
+	&.active {
+		top: 0px;
+		.transition(0.3s);
+	}
+
+	&:hover::after {
+		opacity: 1;
+		.transition(0.3s);
+	}
+}
+#container {
+	position: fixed;
+	top: 300px;
+	left: 12%;
+	width: 76%;
+	text-align: center;
+}

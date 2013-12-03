@@ -15,35 +15,6 @@ $(document).ready ->
 		width: 561
 		height: 137
 
-	button =
-		width: 289
-		height: 123
-
-	mainColor = '#1cafd4'
-
-	buttonList = [
-		{
-			text: 'Forum'
-			func: -> window.location = 'http://severepvp.net/community/'
-		}
-		{
-			text: 'Vote'
-			func: ->
-		}
-		{
-			text: 'Shop'
-			func: -> window.location = 'http://severepvp.buycraft.net/'
-		}
-		{
-			text: 'Staff'
-			func: ->
-		}
-		{
-			text: 'Bans'
-			func: -> window.location = 'http://severepvp.net/banmanagement/'
-		}
-	]
-
 	# End Configure -------------------------------------------------------
 
 	# Start Global Setups -------------------------------------------------
@@ -54,7 +25,8 @@ $(document).ready ->
 	ctx    = $canvas[0].getContext('2d')
 
 	screen = {}
-	buttonsizes = {}
+
+	$('.button').each (index) -> $(@).css('left', (index * 20) + '%')
 
 	do setsizes = ->
 		o_screen =
@@ -69,14 +41,14 @@ $(document).ready ->
 			screen =
 				width : o_screen.height * ratio
 				height: o_screen.height
-		
-		buttonsizes = 
-			width : Math.min(1000, screen.width * 0.8)
-			height: Math.min(1000, screen.width * 0.8) * 0.1
 
 		$canvas.attr
 			width : screen.width
 			height: screen.height
+
+		$('#frame').css
+			width: screen.width * 0.8
+			height: screen.height * 0.8
 
 	$(window).on 'resize', _.throttle(setsizes, 50)
 
@@ -126,69 +98,24 @@ $(document).ready ->
 
 	# End 3D Background ---------------------------------------------------
 
-	# Start Button --------------------------------------------------------
-	
-	class Button
-		constructor: (text, eve) ->
-			@text = text
-			@hovering = false
-			@eve = eve
-			@deg = Math.random() * Math.PI
-			Renderer.buttons.push @
-
-		calcRect: (index = 0, len = 1) ->
-			factor = Math.min((screen.width * 0.8) / (len * (button.width + -30)), 1)
-			spacing = -30 * factor
-
-			return {
-				factor: factor
-				width: button.width * factor
-				height: button.height * factor
-				spacing: spacing
-				y: (screen.height - button.height * factor) * 0.5
-				x: (screen.width - (len * (button.width * factor + spacing))) * 0.5 + index * (button.width * factor + spacing)
-				text_x: button.width * 0.5 * factor
-				text_y: button.height * 1.9 * factor
-			}
-
-		render: (index, len) ->
-			
-			ctx.font = '24px Orbitron'
-			ctx.textBaseline = 'middle'
-			ctx.textAlign = 'center'
-
-			debugger;
-			i = @calcRect index, len
-
-			ctx.drawImage resources.basePlate, i.x, i.y + 120 * i.factor, i.width, i.height
-			ctx.drawImage resources['ico' + @text], i.x + (button.width - 128) * 0.5 * i.factor, i.y + Math.cos(@deg) * 20 * i.factor, 128 * i.factor, 128 * i.factor
-			
-			@deg += 0.05
-
-			if @hovering
-				styles = ['#666600', '#ffff00']
-			else
-				styles = ['#000000', '#ffffff']
-
-			ctx.fillStyle = styles[0]
-			ctx.fillText @text, i.x + i.text_x + 2, i.y + i.text_y + 2
-			ctx.fillStyle = styles[1]
-			ctx.fillText @text, i.x + i.text_x, i.y + i.text_y
-
-	# End Button ----------------------------------------------------------
-
 	# Start Render Tie-in -------------------------------------------------
 
 	class RendererO
 		constructor: ->
 			@starter = _.after 2, ->
 				@bg = new Background
-
-				for b in buttonList
-					new Button(b.text, b.func)
-
 				@render()
-				menuTriggers()
+
+				setTimeout(
+					->
+						$('.button').each (index) ->
+							setTimeout(
+								=>
+									$(@).addClass('active')
+								, Math.round(Math.random() * 400)
+							)
+					, 300
+				)
 
 			@fadep = 0
 			@stage = 0
@@ -256,17 +183,10 @@ $(document).ready ->
 			ctx.textAlign = 'right'
 			ctx.fillText 'Coded by Vector Media', screen.width - 5, screen.height - 5
 
-		renderButtons: =>
-			l = @buttons.length
-			for b, index in @buttons
-				b.render(index, l)
-
-
 		render: =>
 
 			if @stage is 1 or @stage is 2
 				@bg.fmAnimate()
-				@renderButtons()
 				@logoAndMotd()
 				@credits()
 
@@ -298,14 +218,7 @@ $(document).ready ->
 
 	resources =
 		bg: 'img/bg.png'
-		basePlate: 'img/baseplate.png'
 		logo: 'img/logo.png'
-		icoBans: 'img/ico-bans.png'
-		icoForum: 'img/ico-forum.png'
-		icoShop: 'img/ico-shop.png'
-		icoStaff: 'img/ico-staff.png'
-		icoVote: 'img/ico-vote.png'
-
 	loader = _.after _.keys(resources).length, Renderer.start
 
 	for key, url of resources
@@ -316,39 +229,5 @@ $(document).ready ->
 
 	# End Preloaders ------------------------------------------------------
 
-	# Document Triggers ---------------------------------------------------
-
-	menuTriggers = ->
-
-		getMousePos = (canvas, evt) ->
-			rect = $canvas[0].getBoundingClientRect()
-			return {
-				x: evt.clientX - rect.left,
-				y: evt.clientY - rect.top
-			}
-
-
-		$canvas.on 'mousemove', _.throttle(
-			(evt) ->
-				mousePos = getMousePos canvas, evt
-				tick = false
-				for b, index in Renderer.buttons
-					i = b.calcRect(index, Renderer.buttons.length)
-					if mousePos.x > i.x and mousePos.y > i.y and mousePos.x < i.x + i.width and mousePos.y < i.y + i.height * 2
-						b.hovering = true
-						$canvas.css 'cursor', 'pointer'
-						tick = true
-					else
-						b.hovering = false
-
-				if tick is true
-					$canvas.css 'cursor', 'pointer'
-				else 
-					$canvas.css 'cursor', 'auto'
-
-			, fps.background * 0.5
-		)
-
-		$canvas.on 'click', ->
-			for b, index in Renderer.buttons
-				if b.hovering is true then b.eve()
+	$('a.frame').on 'click', (e) ->
+		e.preventDefault()
