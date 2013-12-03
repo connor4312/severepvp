@@ -16,7 +16,7 @@
 	<canvas id="canvas"></canvas>
 	<div id="container">
 		<a class="button frame" style="background-image:url('img/btn-forum.png')" href="http://severepvp.net/community/">Forum</a>
-		<a class="button frame" style="background-image:url('img/btn-vote.png')" id="voteclick">Vote</a>
+		<a class="button frame" data-id='1' style="background-image:url('img/btn-vote.png')" id="voteclick">Vote</a>
 		<a class="button frame" style="background-image:url('img/btn-shop.png')" href="http://severepvp.buycraft.net/">Shop</a>
 		<a class="button frame" style="background-image:url('img/btn-bans.png')" href="http://severepvp.net/banmanagement/">Bans</a>
 		<a class="button frame" style="background-image:url('img/btn-staff.png')" href="http://severepvp.net/banmanagement/">Staff</a>
@@ -26,13 +26,16 @@
 			<div id="votebox">
 				<b>Don't forget to vote on every site!</b>
 				<li>
-					<a class="frame" href="http://minecraftservers.org/vote/17146" target="_blank">MinecraftServers.org</a>
-					<a class="frame" href="http://minecraft-server-list.com/server/92295/vote/" target="_blank">Minecraft-Server-List.com</a>
-					<a class="frame" href="https://minestatus.net/44141-severepvp-factions-hardcore-24-7-nolag-gief/vote" target="_blank">MineStatus</a>
-					<a class="frame" href="http://www.planetminecraft.com/server/severepvp-factions-mcmmo-auctions-lottery-griefing-no-lag/vote/" target="_blank">PlanetMinecraft</a>
+					<a class="frame" data-id='1'>MinecraftServers.org</a>
+					<a class="frame" data-id='2'>Minecraft-Server-List.com</a>
+					<a class="frame" data-id='3'>MineStatus</a>
+					<a href="http://www.planetminecraft.com/server/severepvp-factions-mcmmo-auctions-lottery-griefing-no-lag/vote/">PlanetMinecraft</a>
 				</li>
 			</div>
-			<iframe src="http://www.w3schools.com" seamless></iframe>
+			<iframe src="" id="frame0" seamless></iframe>
+			<iframe src="http://minecraftservers.org/vote/17146" id="frame1" seamless></iframe>
+			<iframe src="http://minecraft-server-list.com/server/92295/vote/" id="frame2" seamless></iframe>
+			<iframe src="https://minestatus.net/44141-severepvp-factions-hardcore-24-7-nolag-gief/vote" id="frame3" seamless></iframe>
 		</div>
 	</div>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>

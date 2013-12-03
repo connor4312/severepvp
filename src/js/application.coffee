@@ -59,13 +59,17 @@ $(document).ready ->
 
 	# Start Video Stage ---------------------------------------------------
 	
-	$video[0].play()
-	do draw = ->
-		if not $video[0].paused and not $video[0].ended
-			ctx.drawImage $video[0], 0, 0, screen.width, screen.height
-			setTimeout draw, fps.video
-		else
-			Renderer.start()
+	setTimeout(
+		->
+			$video[0].play()
+			do draw = ->
+				if not $video[0].paused and not $video[0].ended
+					ctx.drawImage $video[0], 0, 0, screen.width, screen.height
+					setTimeout draw, fps.video
+				else
+					Renderer.start()
+		, 1000
+	)
 	
 	# End Vide Stoage -----------------------------------------------------
 	
@@ -231,10 +235,19 @@ $(document).ready ->
 
 	# End Preloaders ------------------------------------------------------
 
+	showFrame = (id = 0) ->
+		$('#frame > iframe').css('display', 'none')
+		$('#frame' + id).css('display', 'block')
+
 	$('a.frame').on 'click', (e) ->
 		e.preventDefault()
 		$('#fcontainer').addClass('active')
-		$('#frame > iframe')[0].window.location = $(@).attr('href')
+
+		id = $(@).attr('data-id') ? 0
+
+		showFrame id
+		if $(@).attr('href')
+			$('#frame' + id)[0].window.location = $(@).attr('href')
 
 		return false
 
