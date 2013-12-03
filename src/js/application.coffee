@@ -49,8 +49,8 @@ $(document).ready ->
 		$('#frame').css
 			width: screen.width * 0.8
 			height: screen.height * 0.8
-			left: screen.width * 0.1
-			top: screen.height * 0.1
+			left: (o_screen.width - screen.width * 0.8) * 0.5
+			top: (o_screen.height - screen.height * 0.8) * 0.5
 
 	$(window).on 'resize', _.throttle(setsizes, 50)
 

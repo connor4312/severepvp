@@ -84,15 +84,6 @@ module.exports = function(grunt) {
           cwd: 'src',
           src: ['**/*.{webm,mp4,ttf,eot,svg,woff}'],
           dest: 'dist'
-        }, {
-          src: ['bower_components/phoria/scripts/phoria-min.js'],
-          dest: 'dist/js/phoria.js'
-        }, {
-          src: ['bower_components/jquery/jquery.min.js'],
-          dest: 'dist/js/jquery.js'
-        }, {
-          src: ['bower_components/underscore/underscore-min.js'],
-          dest: 'dist/js/underscore.js'
         }]
       }
     },
