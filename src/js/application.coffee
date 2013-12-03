@@ -49,6 +49,8 @@ $(document).ready ->
 		$('#frame').css
 			width: screen.width * 0.8
 			height: screen.height * 0.8
+			left: screen.width * 0.1
+			top: screen.height * 0.1
 
 	$(window).on 'resize', _.throttle(setsizes, 50)
 
@@ -231,3 +233,16 @@ $(document).ready ->
 
 	$('a.frame').on 'click', (e) ->
 		e.preventDefault()
+		$('#fcontainer').addClass('active')
+		$('#frame > iframe')[0].window.location = $(@).attr('href')
+
+		return false
+
+	$('#frame').on 'click', (e) ->
+		e.stopPropagation()
+
+	$('#voteclick').on 'click', (e) ->
+		$('#votebox').css 'visibility', 'visible'
+
+	$('#fcontainer, .close').on 'click', ->
+		$('#fcontainer').removeClass('active')
