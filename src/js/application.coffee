@@ -247,7 +247,8 @@ $(document).ready ->
 
 		showFrame id
 		if $(@).attr('href')
-			$('#frame' + id)[0].window.location = $(@).attr('href')
+			$('#votebox').css 'visibility', 'hidden'
+			$('#frame' + id).attr 'src', $(@).attr('href')
 
 		return false
 

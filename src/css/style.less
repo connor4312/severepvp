@@ -2,6 +2,8 @@
 @import "../../bower_components/bootstrap/less/mixins.less";
 @import "../../bower_components/bootstrap/less/normalize.less";
 
+@import "../../bower_components/bootstrap/less/tables.less";
+
 @font-face {
 	font-family:"Minecraft";
 	src:url("../fonts/minecraft.eot?") format("eot"),
@@ -15,6 +17,7 @@
 
 body {
 	background: #060606;
+	color: #fff;
 }
 
 a {
@@ -65,7 +68,7 @@ a {
 
 	&:hover::after {
 		opacity: 1;
-		.transition(0.3s);
+		.transition(0.6s);
 	}
 }
 #container {
@@ -105,7 +108,7 @@ a {
 	left: 50%;
 	background: #000;
 	border-radius: 10px;
-	box-shadow: 0 0 30px;
+	box-shadow: 0 0 30px #000;
 	padding: 10px;
 	> iframe {
 		width: 100%;
@@ -139,4 +142,10 @@ a {
 			text-decoration: underline;
 		}
 	}
+}
+
+#tcont {
+	width: 400px;
+	color: #fff;
+	margin: 0 auto;
 }
