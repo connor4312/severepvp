@@ -235,9 +235,18 @@ $(document).ready ->
 
 	# End Preloaders ------------------------------------------------------
 
+	frame = 0
+	maxframes = $('iframe').length - 1
+
 	showFrame = (id = 0) ->
+		frame = parseInt(id)
 		$('#frame > iframe').css('display', 'none')
 		$('#frame' + id).css('display', 'block')
+
+	updateArrows = ->
+		$('#larr, #rarr').css 'display', 'block'
+		$('#larr').css('display', 'none') if frame is 1
+		$('#rarr').css('display', 'none') if frame is maxframes
 
 	$('a.frame').on 'click', (e) ->
 		e.preventDefault()
@@ -246,6 +255,8 @@ $(document).ready ->
 		id = $(@).attr('data-id') ? 0
 
 		showFrame id
+		updateArrows()
+
 		if $(@).attr('href')
 			$('#votebox').css 'visibility', 'hidden'
 			$('#frame' + id).attr 'src', $(@).attr('href')
@@ -260,3 +271,11 @@ $(document).ready ->
 
 	$('#fcontainer, .close').on 'click', ->
 		$('#fcontainer').removeClass('active')
+
+	$('#larr').on 'click', ->
+		showFrame frame - 1
+		updateArrows()
+
+	$('#rarr').on 'click', ->
+		showFrame frame + 1
+		updateArrows()

@@ -12,8 +12,7 @@ module.exports = function(grunt) {
     },
     uglify: {
       options: {
-        banner: '/*! Built with Grunt */',
-        compress: false
+        banner: '/*! Built with Grunt */'
       },
       dist: {
         files: [{
